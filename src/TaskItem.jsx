@@ -1,5 +1,5 @@
-export default function TaskItem({ task, updateTask, deleteTask }) {
-  const { id, value, completed } = task;
+export default function TaskItem({ task, updateTask, deleteTask, addSubTask, deleteSubTask }) {
+  const { id, value, completed, subTasks } = task;
 
   return (
     <div className="task">
@@ -9,7 +9,7 @@ export default function TaskItem({ task, updateTask, deleteTask }) {
         id={id}
         checked={completed}
         onChange={() => {
-          updateTask({ id, completed: !completed });
+          updateTask({ id, completed:!completed });
         }}
       />
       <label
@@ -49,6 +49,50 @@ export default function TaskItem({ task, updateTask, deleteTask }) {
           <polyline points="3 6 5 6 21 6" />
           <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
         </svg>
+
+        <ul>
+          {subTasks.map((subTask) => (
+            <li key={subTask.id}>
+              <input
+                type="checkbox"
+                id={subTask.id}
+                checked={subTask.completed}
+                onChange={() => {
+                  updateTask({ id: subTask.id, completed:!subTask.completed });
+                }}
+              />
+              <label htmlFor={subTask.id}>{subTask.value}</label>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="ml-auto h-5 w-5 cursor-pointer text-red-400 hover:text-red-500"
+                onClick={(e) => {
+                  e.preventDefault();
+                  deleteSubTask({ taskId: id, subTaskId: subTask.id });
+                }}
+              >
+                <polyline points="3 6 5 6 21 6" />
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+              </svg>
+            </li>
+          ))}
+        </ul>
+
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            addSubTask({ taskId: id, subTask: { value: e.target.value } });
+            e.target.value = "";
+          }}
+        >
+          <input type="text" placeholder="Add sub-task" />
+          <button type="submit">Add</button>
+        </form>
       </label>
     </div>
   );

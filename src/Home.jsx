@@ -1,15 +1,28 @@
 import { useState } from "react";
 import TaskItem from "./TaskItem";
 import { Link } from "react-router-dom";
-import  {useGetTaskQuery,useAddTaskMutation,useUpdateTaskMutation,useDeleteTaskMutation} from "./RtkQuery/apiSlice";
+import { useGetTaskQuery, useAddTaskMutation, useUpdateTaskMutation, useDeleteTaskMutation, useGetSubtasksQuery, useAddSubTaskMutation, useUpdateSubTaskMutation, useDeleteSubTaskMutation } from "./RtkQuery/apiSlice";
 
 export default function Home() {
   const [newTask, setNewTask] = useState("");
   const { data: tasksList, isError, isLoading, error } = useGetTaskQuery();
+//   const { data: tasksList, isError, isLoading, error } = useGetSubtasksQuery();
 
   const [addTask] = useAddTaskMutation();
   const [updateTask] = useUpdateTaskMutation();
   const [deleteTask] = useDeleteTaskMutation();
+
+  const addSubTask = async (taskId, subTask) => {
+    await useAddSubTaskMutation({ taskId, subTask });
+  };
+
+  const updateSubTask = async (taskId, subTaskId, updatedSubTask) => {
+    await useUpdateSubTaskMutation({ taskId, subTaskId, updatedSubTask });
+  };
+
+  const deleteSubTask = async (taskId, subTaskId) => {
+    await useDeleteSubTaskMutation({ taskId, subTaskId });
+  };
 
   return (
     <div className="flex h-screen flex-grow items-start justify-center bg-gray-900 p-4">
@@ -76,19 +89,18 @@ export default function Home() {
             </p>
           ) : (
             tasksList.map((task) => (
-              <TaskItem
-                key={task.id}
-                task={task}
-                updateTask={updateTask}
-                deleteTask={deleteTask}
-              />
-            ))
-          )}
+                <TaskItem
+                  key={task.id}
+                  task={task}
+                  updateTask={updateTask}
+                  deleteTask={deleteTask}
+                  addSubTask={(subTask) => addSubTask(task.id, subTask)}
+                  updateSubTask={(subTaskId, updatedSubTask) => updateSubTask(task.id, subTaskId, updatedSubTask)}
+                  deleteSubTask={(subTaskId) => deleteSubTask(task.id, subTaskId)}
+                />
+              ))
+            )}
         </div>
-      </div>
-      <Link to="contact" className="absolute text-gray-800 hover:text-gray-400">
-        Contact
-      </Link>
-    </div>
-  );
-}
+        </div>
+        </div>
+  )}
